@@ -38,16 +38,16 @@
 #import "RKRouteSet.h"
 
 #ifdef _COREDATADEFINES_H
-#if __has_include("RKCoreData.h")
-#define RKCoreDataIncluded
-#import "RKManagedObjectStore.h"
-#import "RKManagedObjectRequestOperation.h"
-#endif
+#   if __has_include("RKCoreData.h")
+#       define RKCoreDataIncluded
+#       import "RKManagedObjectStore.h"
+#       import "RKManagedObjectRequestOperation.h"
+#   endif
 #endif
 
 #if !__has_feature(objc_arc)
-#error RestKit must be built with ARC.
-// You can turn on ARC for only RestKit files by adding "-fobjc-arc" to the build phase for each of its files.
+#error RestKit must be built with ARC. \
+You can turn on ARC for only RestKit files by adding "-fobjc-arc" to the build phase for each of its files.
 #endif
 
 //////////////////////////////////
@@ -171,6 +171,14 @@ extern NSString *RKStringDescribingRequestMethod(RKRequestMethod method);
 @end
 
 @implementation RKMappingGraphVisitor
+
+- (instancetype)init
+{
+    @throw [NSException exceptionWithName:NSInternalInconsistencyException
+                                   reason:[NSString stringWithFormat:@"-init is not a valid initializer for the class %@, use designated initilizer -initWithMapping:", NSStringFromClass([self class])]
+                                 userInfo:nil];
+    return [self init];
+}
 
 - (instancetype)initWithMapping:(RKMapping *)mapping
 {
@@ -347,6 +355,14 @@ static NSString *RKMIMETypeFromAFHTTPClientParameterEncoding(AFHTTPClientParamet
 @end
 
 @implementation RKObjectManager
+
+- (instancetype)init
+{
+    @throw [NSException exceptionWithName:NSInternalInconsistencyException
+                                   reason:[NSString stringWithFormat:@"-init is not a valid initializer for the class %@, use designated initilizer -initWithHTTPClient:", NSStringFromClass([self class])]
+                                 userInfo:nil];
+    return [self init];
+}
 
 - (instancetype)initWithHTTPClient:(AFHTTPClient *)client
 {
@@ -802,8 +818,13 @@ static NSString *RKMIMETypeFromAFHTTPClientParameterEncoding(AFHTTPClientParamet
 
 - (RKPaginator *)paginatorWithPathPattern:(NSString *)pathPattern
 {
+    return [self paginatorWithPathPattern:pathPattern parameters:nil];
+}
+
+- (RKPaginator *)paginatorWithPathPattern:(NSString *)pathPattern parameters:(NSDictionary *)parameters
+{
     NSAssert(self.paginationMapping, @"Cannot instantiate a paginator when `paginationMapping` is nil.");
-    NSMutableURLRequest *request = [self requestWithMethod:@"GET" path:pathPattern parameters:nil];
+    NSMutableURLRequest *request = [self requestWithMethod:@"GET" path:pathPattern parameters:parameters];
     RKPaginator *paginator = [[self.paginationMapping.objectClass alloc] initWithRequest:request paginationMapping:self.paginationMapping responseDescriptors:self.responseDescriptors];
 #ifdef RKCoreDataIncluded
     paginator.managedObjectContext = self.managedObjectStore.mainQueueManagedObjectContext;
