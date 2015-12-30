@@ -144,7 +144,12 @@ extern NSString *RKStringDescribingRequestMethod(RKRequestMethod method);
 
 - (BOOL)matchesResponse:(NSHTTPURLResponse *)response request:(NSURLRequest *)request
 {
-    if (! ([self matchesURL:response.URL parsedArguments:nil] || [self matchesURL:request.URL parsedArguments:nil])) return NO;
+    if (! ([self matchesURL:response.URL parsedArguments:nil] || [self matchesURL:request.URL parsedArguments:nil])){
+        return NO;
+    }
+    else {
+        return YES;
+    }
 }
 
 - (BOOL)matchesResponse:(NSHTTPURLResponse *)response parsedArguments:(NSDictionary **)outParsedArguments
